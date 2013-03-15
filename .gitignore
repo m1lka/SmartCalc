@@ -1,9 +1,7 @@
-TestParser
-/CMakeFiles
-CMakeCache.txt
-cmake_install.cmake
+/src/*.o
+/src/*.swp
+/src/*~
+/src/*.swp
 *.user
 *.cbp
-*swp
-Makefile
 *~
