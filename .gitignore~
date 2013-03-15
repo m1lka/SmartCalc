@@ -1,0 +1,7 @@
+TestParser
+/CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+*.user
+*.cbp
+*swp
