@@ -1,4 +1,4 @@
 SmartCalc
 =========
 
-Сalculator of mathematical expressions
+Калькулятор математических выражений

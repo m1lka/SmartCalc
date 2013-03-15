@@ -1,8 +1,11 @@
-#include <iostream>
 #include <cstring>
 #include <cstdlib>
+#include <cstdio>
 #include <cmath>
+#include <cctype>
 #include <cstring>
+
+#define MSG(text, ...) printf(text, ##__VA_ARGS__)
 
 struct token_t {
     int type;
@@ -15,7 +18,6 @@ struct parser {
     unsigned index;
     int error;
     int init;
-    int skip_expr;
 
     parser()
     {
@@ -251,7 +253,7 @@ float call_func(parser &p, int func_id)
     if(p.tokens[p.index].type == IDENTIFIER) {
         p.index++;
     } else {
-        std::cout << "expected func name\n";
+        MSG("expected func name\n");
         return 0.0f;
     }
 
@@ -268,7 +270,7 @@ float call_func(parser &p, int func_id)
         }
 
         if(n_args == 0) {
-            std::cout << "wrong func\n";
+            MSG("wrong func\n");
             return 0.0f;
         }
 
@@ -291,37 +293,37 @@ float call_func(parser &p, int func_id)
 #undef func_ptrs
 
         if(!flag_found) {
-            std::cout << "wrong number of arguments\n";
+            MSG("wrong number of arguments\n");
             return 0.0f;
         }
 
-        std::cout << "call func id = " << func_id << " n_args = " << n_args << "\n";
+        MSG("call func id = %i n_args = %i\n", func_id, n_args);
 
         if(!func1_ptr) {
-            std::cout << "null pointer to function\n";
+            MSG("null pointer to function\n");
             return 0.0f;
         }
 
         bool flag_found_pr = 0;
         int r = 0;
         eval_expr_1(p, args);
-        std::cout << "args = " << args << "\n";
+        MSG("args = %f\n", args);
 
         if(p.tokens[p.index].type == PARENTHESIS_RIGHT) {
             flag_found_pr = 1;
             p.index++;
         } else {
-            std::cout << "expected )\n";
+            MSG("expected )\n");
             return 0.0f;
         }
 
         if(r+1 != n_args) {
-            std::cout << "wrong number of arguments\n";
+            MSG("wrong number of arguments\n");
             return 0.0f;
         }
 
     } else {
-        std::cout << "expected (\n";
+        MSG("expected (\n");
         return 0.0f;
     }
 
@@ -333,7 +335,7 @@ float call_func(parser &p, int func_id)
             break;
 
         default:
-            std::cout << "wrong number of arguments\n";
+            MSG("wrong number of arguments\n");
     }
     return result;
 }
@@ -341,7 +343,7 @@ float call_func(parser &p, int func_id)
 void atom(parser &p, float &value)
 {
     int id = 0, last = 0;
-    std::cout << "atom = " << p.tokens[p.index].data << "\n";
+    MSG("atom = %s\n", p.tokens[p.index].data);
 
     switch(p.tokens[p.index].type) {
         case IDENTIFIER:
@@ -351,19 +353,19 @@ void atom(parser &p, float &value)
 
         } else {
             if(p.tokens[p.index+1].type == PARENTHESIS_LEFT)
-                std::cout << "unknown func\n";
+                MSG("unknown func\n");
         }
         break;
         case FLOAT_NUMBER:
             value = (float)atof((const char*)p.tokens[p.index].data);
-            std::cout << "found float num\n";
+            MSG("found float num\n");
             p.index++;
             break;
 
         case INT_NUMBER:
             value = (float)atoi((const char*)p.tokens[p.index].data);
-            std::cout << "found int number\n";
-            std::cout << "num = " << p.tokens[p.index].data << "\n";
+            MSG("found int number\n");
+            MSG("num = %s\n", p.tokens[p.index].data);
 
             p.index++;
             break;
@@ -371,21 +373,21 @@ void atom(parser &p, float &value)
         case PARENTHESIS_RIGHT:
             return;
         default:
-            std::cout << "unknow\n";
+            MSG("unknow\n");
     };
 }
 
 /// ( )
 void eval_expr5(parser &p, float &value)
 {
-    std::cout << "EVAL5\n";
+    MSG("EVAL5\n");
     if(p.tokens[p.index].type == PARENTHESIS_LEFT) {
         p.index++;
 
         eval_expr(p, value);
 
         if(p.tokens[p.index].type != PARENTHESIS_RIGHT) {
-            std::cout << "expected )\n";
+            MSG("expected )\n");
             return;
         }
         p.index++;
@@ -397,11 +399,11 @@ void eval_expr5(parser &p, float &value)
 /// !
 void eval_expr4(parser &p, float &value)
 {
-    std::cout << "EVAL4\n";
+    MSG("EVAL4\n");
     eval_expr5(p, value);
 
     if(p.tokens[p.index].type == EXL) {
-        std::cout << "found !\n";
+        MSG("found !\n");
         if(value == 0.0f) {
             value = 1.0f;
             p.index++;
@@ -409,7 +411,7 @@ void eval_expr4(parser &p, float &value)
         }
 
         if(value < 0.0f) {
-            std::cout << "skip factorial\n";
+            MSG("skip factorial\n");
             p.index++;
             return;
         }
@@ -426,21 +428,21 @@ void eval_expr4(parser &p, float &value)
 /// unary -
 void eval_expr3(parser &p, float &value)
 {
-    std::cout << "EVAL3\n";
+    MSG("EVAL3\n");
     int last = -1;
     if(p.tokens[p.index].type == PLUS || p.tokens[p.index].type == MINUS) {
         last = p.index++;
-        std::cout << "unary + - " << last << "\n";
+        MSG("unary + - %i\n", last);
     }
 
     eval_expr4(p, value);
-    std::cout << "value unary -   = " << value << "\n";
+    MSG("value unary -   = %f\n", value);
     if(last > -1) {
-        std::cout << "unary   token: " << p.tokens[last].data << "\n";
+        MSG("unary   token: %s\n", p.tokens[last].data);
         if(p.tokens[last].type == MINUS) {
-            std::cout << "found unary -\n";
+            MSG("found unary -\n");
             value = -value;
-            std::cout << "value ----- : " << value << "\n";
+            MSG("value ----- : %f", value);
         }
     }
 }
@@ -448,11 +450,11 @@ void eval_expr3(parser &p, float &value)
 /// ^
 void eval_expr2(parser &p, float &value)
 {
-    std::cout << "EVAL2\n";
+    MSG("EVAL2\n");
     eval_expr3(p, value);
     if(p.tokens[p.index].type == CARET) {
         float part = 0.0f;
-        std::cout << "found power\n";
+        MSG("found power\n");
         p.index++;
         eval_expr3(p, part);
 
@@ -487,12 +489,12 @@ void eval_expr2(parser &p, float &value)
 /// * /
 void eval_expr1(parser &p, float &value)
 {
-    std::cout << "EVAL1\n";
+    MSG("EVAL1\n");
     eval_expr2(p, value);
     while(p.tokens[p.index].type == MULT || p.tokens[p.index].type == DIV) {
         float part = 0.0f;
         int last = 0;
-        std::cout << "found * /\n";
+        MSG("found * /\n");
         last = p.index++;
 
         eval_expr2(p, part);
@@ -504,26 +506,26 @@ void eval_expr1(parser &p, float &value)
 
             case DIV:
                 if(part == 0.0f) {
-                    std::cout << "div to NULL\n";
+                    MSG("div to NULL\n");
                     value = 0.0f;
                     return;
                 }
                 value /= part;
                 break;
         };
-        std::cout << "value = " << value;
+        MSG("value = %f\n", value);
     }
 }
 
 /// + -
 void eval_expr0(parser &p, float &value)
 {
-    std::cout << "EVAL0\n";
+    MSG("EVAL0\n");
     eval_expr1(p, value);
     while(p.tokens[p.index].type == PLUS || p.tokens[p.index].type == MINUS) {
         float part = 0.0f;
         int last = 0;
-        std::cout << "found + -\n";
+        MSG("found + -\n");
         last = p.index++;
         eval_expr1(p, part);
         switch(p.tokens[last].type) {
@@ -541,9 +543,9 @@ void eval_expr0(parser &p, float &value)
 /// =
 void eval_expr_1(parser &p, float &value)
 {
-    std::cout << "EVAL_1\n";
+   MSG("EVAL_1\n");
     if(p.tokens[p.index].type == IDENTIFIER) {
-        std::cout << "found ident = " << p.tokens[p.index].data;
+        MSG("found ident = %s\n", p.tokens[p.index].data);
 
         if(p.tokens[p.index+1].type == PARENTHESIS_LEFT) {
             eval_expr0(p, value);
@@ -556,9 +558,9 @@ void eval_expr_1(parser &p, float &value)
 
 void eval_expr(parser &p, float &value)
 {
-    std::cout << "EVAL\n";
+    MSG("EVAL\n");
     if(p.index > (p.num_tokens - 1)) {
-        std::cout << "no expression\n";
+        MSG("no expression\n");
         return;
     }
 
@@ -574,22 +576,22 @@ void syntax_parser(parser &p)
     do {
         float value = 0.0f;
         if(p.tokens[p.index].type == IDENTIFIER) {
-            std::cout << "token is identificator\n";
+            MSG("token is identificator\n");
             eval_expr(p, value);
         }
         else {
             eval_expr0(p, value);
-            std::cout << "token is not identificator\n";
+            MSG("token is not identificator\n");
         }
         p.index++;
-        std::cout << "value = " << value << "\n";
+        MSG("value = %f\n", value);
     } while(p.index < (p.num_tokens - 1));
-    std::cout << "end syntax\n";
+    MSG("end syntax\n");
 }
 
 void lexer_parser(parser &p, const char *s)
 {
-    std::cout << "[DEBUG] lexer_parser()\n";
+    MSG("[DEBUG] lexer_parser()\n");
     char *ptr = (char *)s;
 
     while(*ptr != '\0') {
@@ -600,15 +602,19 @@ void lexer_parser(parser &p, const char *s)
         }
         if(isalpha(*ptr)) {
             char *begin = ptr;
-            std::cout << "isalpha!\n";
-            while((isalpha(*ptr) || isdigit(*ptr)) && ((ptr-begin) < 63)) {std::cout << *ptr << "\n";ptr++;}
+            MSG("isalpha!\n");
+            
+            while((isalpha(*ptr) || isdigit(*ptr)) && ((ptr-begin) < 63)) {
+            	MSG("%c\n", *ptr); ptr++;
+            }
+            
             p.tokens[p.num_tokens].type = IDENTIFIER;
             p.tokens[p.num_tokens].data = (char*)malloc(sizeof(char) * (ptr-begin));
             textcpy(begin, p.tokens[p.num_tokens].data, (ptr-begin));
             ptr--;
             p.num_tokens++;
         } else if(isdigit(*ptr)) {
-            std::cout << "isdigit! : ";
+            MSG("isdigit! : ");
             char *begin = ptr;
             while(isdigit(*ptr))
                 ptr++;
@@ -618,10 +624,10 @@ void lexer_parser(parser &p, const char *s)
                     ptr++;
                 while(isdigit(*ptr))
                     ptr++;
-                std::cout << "float num\n";
+                MSG("float num\n");
                 p.tokens[p.num_tokens].type = FLOAT_NUMBER;
             } else {
-                std::cout << "int num\n";
+                MSG("int num\n");
                 p.tokens[p.num_tokens].type = INT_NUMBER;
             }
             p.tokens[p.num_tokens].data = (char*) malloc(sizeof(char) * (ptr - begin));
@@ -629,80 +635,80 @@ void lexer_parser(parser &p, const char *s)
             ptr--;
             p.num_tokens++;
         } else if(isprint(*ptr)) {
-            std::cout << "isprint! : ";
+            MSG("isprint! : ");
             switch(*ptr) {
 
             case '(':
-                std::cout << "(\n";
+                MSG("(\n");
                 p.tokens[p.num_tokens].type = PARENTHESIS_LEFT;
                 p.tokens[p.num_tokens].data = (char*)malloc(sizeof(char) * 1);
                 textcpy(ptr, p.tokens[p.num_tokens].data, 1);
                 break;
 
             case ')':
-                std::cout << ")\n";
+                MSG(")\n");
                 p.tokens[p.num_tokens].type = PARENTHESIS_RIGHT;
                 p.tokens[p.num_tokens].data = (char*)malloc(sizeof(char) * 1);
                 textcpy(ptr, p.tokens[p.num_tokens].data, 1);
                 break;
 
             case '!':
-                std::cout << "!\n";
+                MSG("!\n");
                 p.tokens[p.num_tokens].type = EXL;
                 p.tokens[p.num_tokens].data = (char *)malloc(sizeof(char) * 1);
                 textcpy(ptr, p.tokens[p.num_tokens].data, 1);
                 break;
 
             case '^':
-                std::cout << "^\n";
+                MSG("^\n");
                 p.tokens[p.num_tokens].type = CARET;
                 p.tokens[p.num_tokens].data = (char*)malloc(sizeof(char) * 1);
                 textcpy(ptr, p.tokens[p.num_tokens].data, 1);
                 break;
 
             case '*':
-                std::cout << "*\n";
+                MSG("*\n");
                 p.tokens[p.num_tokens].type = MULT;
                 p.tokens[p.num_tokens].data = (char*)malloc(sizeof(char) * 1);
                 textcpy(ptr, p.tokens[p.num_tokens].data, 1);
                 break;
 
             case '/':
-                std::cout << "/\n";
+                MSG("/\n");
                 p.tokens[p.num_tokens].type = DIV;
                 p.tokens[p.num_tokens].data = (char*)malloc(sizeof(char) * 1);
                 textcpy(ptr, p.tokens[p.num_tokens].data, 1);
                 break;
 
             case '+':
-                std::cout << "+\n";
+                MSG("+\n");
                 p.tokens[p.num_tokens].type = PLUS;
                 p.tokens[p.num_tokens].data = (char*)malloc(sizeof(char) * 1);
                 textcpy(ptr, p.tokens[p.num_tokens].data, 1);
                 break;
 
             case '-':
-                std::cout << "-\n";
+                MSG("-\n");
                 p.tokens[p.num_tokens].type = MINUS;
                 p.tokens[p.num_tokens].data = (char*)malloc(sizeof(char) * 1);
                 textcpy(ptr, p.tokens[p.num_tokens].data, 1);
                 break;
 
             default:
-                std::cout << "!не тот символ!\n";
+                MSG("undefined token\n");
                 return;
             };
             p.num_tokens++;
         }
         ptr++;
         if(*ptr == '\0') {
-            std::cout << "null_symbol\n";
+            MSG("null_symbol\n");
             p.tokens[p.num_tokens].data = (char*)malloc(sizeof(char) * 1);
             textcpy("]", p.tokens[p.num_tokens].data, 1);
             p.num_tokens++;
         }
     }
-    std::cout << "close : lexer_parser()\n";
+    MSG("close : lexer_parser()\n");
 }
 #undef textcpy
 
@@ -713,9 +719,9 @@ int main()
     lexer_parser(p, "56+5+6");
     syntax_parser(p);
     for(int i = 0; i < p.num_tokens; i++) {
-        std::cout << "(" << p.tokens[i].data << ") ";
+        MSG("( %s )\n", p.tokens[i].data);
     }
-    std::cout << "\n";
+    MSG("\n");
     return 0;
 }
 
