@@ -53,7 +53,7 @@ enum {
 };
 
 enum {
-    FUNCTION = 1, VARIABLE
+    FUNCTION = 1, VARIABLE, EOE
 };
 
 }

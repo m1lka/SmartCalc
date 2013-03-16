@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(SmartCalc)
+project(Calculator_temporarily)
 set(SOURCE_CODE main.cpp)
 set(SOURCE_DIR ./src)
 set(INCLUDE_DIR ./include)
@@ -15,8 +15,8 @@ set(HEADER ${INCLUDE_DIR}/parser.h
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL Linux)
 	add_definitions(-D_lin)
-	add_executable(smartcalc ${HEADER} ${SOURCE} ${SOURCE_CODE})
+	add_executable(calc_0.1.1 ${HEADER} ${SOURCE} ${SOURCE_CODE})
 elseif($(CMAKE_SYSTEM_NAME) STREQUAL Windows)
 	add_definitions(-D_win32)
-	add_executable(smartcalc ${HEADER} ${SOURCE} ${SOURCE_CODE})
+	add_executable(calc_0.1.1 ${HEADER} ${SOURCE} ${SOURCE_CODE})
 endif()

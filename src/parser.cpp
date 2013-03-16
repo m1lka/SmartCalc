@@ -237,7 +237,7 @@ void Parser::eval_expr3(float &value)
         float part = 0.0f;
         MSG("found power\n");
         Parser::P.index++;
-        eval_expr4(part);
+        Parser::eval_expr4(part);
 
         if(part == 0.0f) {
             value = 1.0f;
@@ -276,6 +276,8 @@ void Parser::eval_expr2(float &value)
         float part = 0.0f;
         int last = 0;
         MSG("found * /\n");
+        MSG("%s\n", Parser::P.tokens[Parser::P.index].data);
+
         last = Parser::P.index++;
 
         Parser::eval_expr3(part);
@@ -308,6 +310,7 @@ void Parser::eval_expr1(float &value)
         int last = 0;
         MSG("found + -\n");
         last = Parser::P.index++;
+        MSG("%s\n", Parser::P.tokens[Parser::P.index].data);
         Parser::eval_expr2(part);
         switch(Parser::P.tokens[last].type) {
             case Parser_types::PLUS:
@@ -486,6 +489,7 @@ void Parser::lexer_parser(const char *text)
         if(*ptr == '\0') {
             MSG("null_symbol\n");
             Parser::P.tokens[Parser::P.num_tokens].data = (char*)malloc(sizeof(char) * 1);
+            Parser::P.tokens[Parser::P.num_tokens].type = Parser_types::EOE;
             textcpy("]", Parser::P.tokens[Parser::P.num_tokens].data, 1);
             Parser::P.num_tokens++;
         }
