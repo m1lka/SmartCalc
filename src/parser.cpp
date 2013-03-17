@@ -5,6 +5,12 @@
 #include <cstring>
 #include <iostream>
 
+float value = 0.0f;
+Parser_types::float_var_value float_buildin_var[2] =
+{
+    {50, 0.0}, {0, 0.0}
+};
+
 #define textcpy(text_p, to_p, n) for(int i = 0; i < n; i++) {to_p[i] = text_p[i];} to_p[n] = '\0';
 
 int Parser::find_identifier(const char *name, int type)
@@ -13,14 +19,14 @@ int Parser::find_identifier(const char *name, int type)
     while(Builtin::identfiers[i].type != 0) {
         if(!strcmp(Builtin::identfiers[i].name, name)) {
             if(Builtin::identfiers[i].type == type)
-                return Builtin::identfiers[i].global_id;
+            {MSG("id var = %i", Builtin::identfiers[i].global_id);return Builtin::identfiers[i].global_id;}
         }
         i++;
     }
-
     return -1;
 }
 
+#define find_var(name) (Parser::find_identifier(name, Parser_types::VARIABLE))
 #define find_func(name) (Parser::find_identifier(name, Parser_types::FUNCTION))
 
 float Parser::call_func(int func_id)
@@ -120,6 +126,44 @@ float Parser::call_func(int func_id)
     return result;
 }
 
+float Parser::get_var_value(int global_id)
+{
+    int i = 0;
+    while(float_buildin_var[i].global_id != 0) {
+        MSG("id = %i <> %i\n", global_id, float_buildin_var[i].global_id);
+        if(float_buildin_var[i].global_id == global_id) {
+            return float_buildin_var[i].value_var;
+        }
+        i++;
+    }
+    return -1.0;
+}
+
+char* Parser::get_var_name(int global_id)
+{
+    int i = 0;
+    while(Builtin::identfiers[i].global_id != 0) {
+        if(Builtin::identfiers[i].global_id == global_id && Builtin::identfiers[i].type == Parser_types::VARIABLE) {
+            return (char*)Builtin::identfiers[i].name;
+        }
+        i++;
+    }
+    return NULL;
+}
+
+void Parser::assign_var(int global_id, float value)
+{
+    int i = 0;
+    MSG("assign: %s(%i) = %f\n", Parser::get_var_name(global_id), global_id, value);
+    while(float_buildin_var[i].global_id != 0) {
+        if(float_buildin_var[i].global_id != 0) {
+            float_buildin_var[i].value_var = value;
+            return;
+        }
+        i++;
+    }
+}
+
 // ololo
 void Parser::atom(float &value)
 {
@@ -127,11 +171,15 @@ void Parser::atom(float &value)
     MSG("atom = %s\n", Parser::P.tokens[Parser::P.index].data);
 
     switch(Parser::P.tokens[Parser::P.index].type) {
-        case Parser_types::IDENTIFIER:
+    case Parser_types::IDENTIFIER:
         if((id = find_func(Parser::P.tokens[Parser::P.index].data)) != -1) {
             last = Parser::P.index;
             value = call_func(id);
-
+        } else if((id = find_var(Parser::P.tokens[Parser::P.index].data)) != -1) {
+            last = Parser::P.index;
+            value = Parser::get_var_value(id);
+            MSG("get var: %s = %f", Parser::P.tokens[Parser::P.index].data, value);
+            Parser::P.index++;
         } else {
             if(Parser::P.tokens[Parser::P.index+1].type == Parser_types::PARENTHESIS_LEFT)
                 MSG("unknown func\n");
@@ -330,12 +378,27 @@ void Parser::eval_expr0(float &value)
     MSG("EVAL0\n");
      if(Parser::P.tokens[Parser::P.index].type == Parser_types::IDENTIFIER) {
          MSG("found ident = %s\n", Parser::P.tokens[Parser::P.index].data);
-
-         if(Parser::P.tokens[Parser::P.index+1].type == Parser_types::PARENTHESIS_LEFT) {
-             Parser::eval_expr1(value);
+         int var_id = -1;
+         if((var_id = find_var(Parser::P.tokens[Parser::P.index].data)) < 0) {
+             if(Parser::P.tokens[Parser::P.index+1].type == Parser_types::PARENTHESIS_LEFT) {
+                 Parser::eval_expr1(value);
+                 return;
+             }
+         }
+         MSG("\nololololololo\n");
+         if(var_id <= 0) {
+             MSG("EVAL0 exit var_id < 0");
              return;
          }
-         Parser::P.index++;
+
+         MSG("found var: %s\n", Parser::P.tokens[Parser::P.index].data);
+         float var_value = Parser::get_var_value(var_id);
+         MSG("Value var x = %f\n", var_value);
+         Parser::assign_var(var_id, var_value);
+         value = var_value;
+         MSG("EVAL0 value = %f\n", value);
+         Parser::eval_expr1(value);
+         return;
      }
      Parser::eval_expr1(value);
 }
@@ -356,10 +419,11 @@ void Parser::eval_expr(float &value)
     Parser::eval_expr0(value);
 }
 
-void Parser::syntax_parser()
+float Parser::syntax_parser()
 {
+    float value = 0.0f;
     do {
-        float value = 0.0f;
+        value = 0.0f;
         if(Parser::P.tokens[Parser::P.index].type == Parser_types::IDENTIFIER) {
             MSG("token is identificator\n");
             Parser::eval_expr(value);
@@ -369,9 +433,10 @@ void Parser::syntax_parser()
             MSG("token is not identificator\n");
         }
         Parser::P.index++;
-        MSG("value = %f\n", value);
     } while(Parser::P.index < (Parser::P.num_tokens - 1));
     MSG("end syntax\n");
+    MSG("value = %f\n", value);
+    return value;
 }
 
 void Parser::lexer_parser(const char *text)
@@ -497,12 +562,30 @@ void Parser::lexer_parser(const char *text)
     MSG("close : lexer_parser()\n");
 }
 
+void Parser::parser_create()
+{
+    Parser_types::float_var_value test[2] = {{50, 0.0}, //x
+                                            {0, 0.0}};
+    MSG("parser_create x = %f\n", Parser::get_var_value(50));
+}
+
 void Parser::parse_text(const char *text)
 {
     setlocale(LC_NUMERIC, "C");
-    lexer_parser(text);
-    syntax_parser();
+    //Parser::assign_var(50, 8.0);
+    MSG("value x = %f\n", float_buildin_var[0].value_var);
+    Parser::lexer_parser(text);
+    value = Parser::syntax_parser();
+    Parser::assign_var(50, value);
     for(int i = 0; i < Parser::P.num_tokens; i++) {
         MSG("(%s) ", Parser::P.tokens[i].data);
     }
+    MSG("\n");
+    for(int i = 0; i < Parser::P.num_tokens; i++) {
+        free(Parser::P.tokens[i].data);
+        Parser::P.tokens[i].data = NULL;
+        Parser::P.tokens[i].type = 0;
+    }
+    Parser::P.index = 0;
+    Parser::P.num_tokens = 0;
 }

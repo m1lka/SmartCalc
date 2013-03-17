@@ -10,24 +10,6 @@ struct token_t {
     char *data;
 };
 
-struct parser_t {
-    token_t tokens[256];
-    unsigned num_tokens;
-    unsigned index;
-
-    parser_t()
-    {
-        this->num_tokens = 0;
-        this->index = 0;
-    }
-
-    ~parser_t()
-    {
-        this->num_tokens = 0;
-        this->index = 0;
-    }
-};
-
 typedef float (*func1_t)(float);
 
 struct float_func1_t {
@@ -46,10 +28,34 @@ struct identif_t {
     int global_id;
 };
 
+struct float_var_value {
+    int global_id;
+    float value_var;
+};
+
+struct parser_t {
+    float_var_value float_buildin_var[];
+    token_t tokens[256];
+    unsigned num_tokens;
+    unsigned index;
+
+    parser_t()
+    {
+        this->num_tokens = 0;
+        this->index = 0;
+    }
+
+    ~parser_t()
+    {
+        this->num_tokens = 0;
+        this->index = 0;
+    }
+};
+
 enum {
     UNKNOWN = 1, IDENTIFIER, INT_NUMBER, FLOAT_NUMBER,
-    EXL, CARET, MULT, DIV, PLUS, MINUS, FUNC,
-    PARENTHESIS_LEFT, PARENTHESIS_RIGHT
+    EXL, CARET, MULT, DIV, PLUS, MINUS,
+    PARENTHESIS_LEFT, PARENTHESIS_RIGHT, VERT_BAR
 };
 
 enum {
@@ -79,7 +85,8 @@ static Parser_types::float_func1_t func1[] =
     {24, (Parser_types::func1_t) &call_log},
     {25, (Parser_types::func1_t) &call_log10},
     {26, (Parser_types::func1_t) &call_exp},
-    {27, (Parser_types::func1_t) &call_exp2}
+    {27, (Parser_types::func1_t) &call_exp2},
+    {28, (Parser_types::func1_t) &call_abs}
 };
 
 static Parser_types::func_param_t param_funcs[] =
@@ -102,6 +109,7 @@ static Parser_types::func_param_t param_funcs[] =
     {25, 1},
     {26, 1},
     {27, 1},
+    {28, 1},
     {0, 0}
 };
 
@@ -109,7 +117,7 @@ static Parser_types::identif_t identfiers[] =
 {
     {Parser_types::FUNCTION, "sin", 10},
     {Parser_types::FUNCTION, "sinh", 11},
-    {Parser_types::FUNCTION, "cos", 121},
+    {Parser_types::FUNCTION, "cos", 12},
     {Parser_types::FUNCTION, "cosh", 13},
     {Parser_types::FUNCTION, "tan", 14},
     {Parser_types::FUNCTION, "tanh", 15},
@@ -125,6 +133,8 @@ static Parser_types::identif_t identfiers[] =
     {Parser_types::FUNCTION, "log10", 25},
     {Parser_types::FUNCTION, "exp", 26},
     {Parser_types::FUNCTION, "exp2", 27},
+    {Parser_types::FUNCTION, "abs", 28},
+    {Parser_types::VARIABLE, "x", 50},
     {0, "", 0}
 };
 
@@ -132,6 +142,8 @@ static Parser_types::identif_t identfiers[] =
 
 class Parser {
     Parser_types::parser_t P;
+
+
 
     void eval_expr(float &value);
     void eval_expr0(float &value);
@@ -144,10 +156,17 @@ class Parser {
     void atom(float &value);
     int find_identifier(const char *name, int type);
     float call_func(int func_id);
-    void syntax_parser();
+    char* get_var_name(int global_id);
+    void assign_var(int global_id, float value);
+    float get_var_value(int global_id);
+    float syntax_parser();
     void lexer_parser(const char *text);
 
 public:
+    Parser() {}
+
+    ~Parser() {}
+    void parser_create();
     void parse_text(const char *text);
 };
 

@@ -93,4 +93,9 @@ static inline float call_exp2(float x)
     return exp2(x);
 }
 
+static inline float call_abs(float x)
+{
+    return fabsf(x);
+}
+
 #endif
