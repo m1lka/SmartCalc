@@ -9,7 +9,7 @@ bool init_log()
     log = fopen("calc.log", "w");
     if(!log)
         return false;
-    fprintf(log, "\tLogger file for Calculator.\n");
+    fprintf(log, "\tLogger file SmartCalc v0.1.1.\n");
 }
 
 void log_print(const char *text, ...)
