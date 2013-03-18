@@ -564,18 +564,19 @@ void Parser::lexer_parser(const char *text)
 
 void Parser::parser_create()
 {
-    Parser_types::float_var_value test[2] = {{50, 0.0}, //x
+    Parser_types::float_var_value test[2] = {{50, 0.0}, //_
                                             {0, 0.0}};
     MSG("parser_create x = %f\n", Parser::get_var_value(50));
 }
 
-void Parser::parse_text(const char *text)
+void Parser::parse_text(const char *text, float &value1)
 {
     setlocale(LC_NUMERIC, "C");
     //Parser::assign_var(50, 8.0);
     MSG("value x = %f\n", float_buildin_var[0].value_var);
     Parser::lexer_parser(text);
     value = Parser::syntax_parser();
+    value1 = value;
     Parser::assign_var(50, value);
     for(int i = 0; i < Parser::P.num_tokens; i++) {
         MSG("(%s) ", Parser::P.tokens[i].data);

@@ -134,7 +134,7 @@ static Parser_types::identif_t identfiers[] =
     {Parser_types::FUNCTION, "exp", 26},
     {Parser_types::FUNCTION, "exp2", 27},
     {Parser_types::FUNCTION, "abs", 28},
-    {Parser_types::VARIABLE, "x", 50},
+    {Parser_types::VARIABLE, "R", 50},
     {0, "", 0}
 };
 
@@ -167,7 +167,7 @@ public:
 
     ~Parser() {}
     void parser_create();
-    void parse_text(const char *text);
+    void parse_text(const char *text, float &value1);
 };
 
 

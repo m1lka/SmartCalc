@@ -3,8 +3,7 @@
 
 #define STRINGIFY(s) #s
 
-
-
+float value_expr = 0.0f;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -43,8 +42,9 @@ void MainWindow::on_expr_text_edit_cursorPositionChanged()
 
 void MainWindow::on_calc_expr_clicked()
 {
+    QString value_expr_str;
     if(!ui->expr_text_edit->toPlainText().isEmpty()) {
-        ui->history_text->setText(ui->expr_text_edit->toPlainText());
-        P.parse_text(ui->expr_text_edit->toPlainText().toAscii().data());
+        P.parse_text(ui->expr_text_edit->toPlainText().toAscii().data(), value_expr);
+        ui->history_text->setText(ui->expr_text_edit->toPlainText() + "=" + value_expr_str.sprintf("%f", value_expr));
     }
 }
