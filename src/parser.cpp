@@ -19,7 +19,9 @@ int Parser::find_identifier(const char *name, int type)
     while(Builtin::identfiers[i].type != 0) {
         if(!strcmp(Builtin::identfiers[i].name, name)) {
             if(Builtin::identfiers[i].type == type)
-            {MSG("id var = %i", Builtin::identfiers[i].global_id);return Builtin::identfiers[i].global_id;}
+            {//MSG("id var = %i", Builtin::identfiers[i].global_id);
+                return Builtin::identfiers[i].global_id;
+            }
         }
         i++;
     }
@@ -39,7 +41,7 @@ float Parser::call_func(int func_id)
     if(Parser::P.tokens[Parser::P.index].type == Parser_types::IDENTIFIER) {
         Parser::P.index++;
     } else {
-        MSG("expected func name\n");
+        //MSG("expected func name\n");
         return 0.0f;
     }
 
@@ -56,7 +58,7 @@ float Parser::call_func(int func_id)
         }
 
         if(n_args == 0) {
-            MSG("wrong func\n");
+            //MSG("wrong func\n");
             return 0.0f;
         }
 
@@ -79,37 +81,37 @@ float Parser::call_func(int func_id)
 #undef func_ptrs
 
         if(!flag_found) {
-            MSG("wrong number of arguments\n");
+            //MSG("wrong number of arguments\n");
             return 0.0f;
         }
 
-        MSG("call func id = %i n_args = %i\n", func_id, n_args);
+        //MSG("call func id = %i n_args = %i\n", func_id, n_args);
 
         if(!func1_ptr) {
-            MSG("null pointer to function\n");
+            //MSG("null pointer to function\n");
             return 0.0f;
         }
 
         bool flag_found_pr = 0;
         int r = 0;
         Parser::eval_expr0(args);
-        MSG("args = %f\n", args);
+        //MSG("args = %f\n", args);
 
         if(Parser::P.tokens[Parser::P.index].type == Parser_types::PARENTHESIS_RIGHT) {
             flag_found_pr = 1;
             Parser::P.index++;
         } else {
-            MSG("expected )\n");
+            //MSG("expected )\n");
             return 0.0f;
         }
 
         if(r+1 != n_args) {
-            MSG("wrong number of arguments\n");
+            //MSG("wrong number of arguments\n");
             return 0.0f;
         }
 
     } else {
-        MSG("expected (\n");
+        //MSG("expected (\n");
         return 0.0f;
     }
 
@@ -130,7 +132,7 @@ float Parser::get_var_value(int global_id)
 {
     int i = 0;
     while(float_buildin_var[i].global_id != 0) {
-        MSG("id = %i <> %i\n", global_id, float_buildin_var[i].global_id);
+        //MSG("id = %i <> %i\n", global_id, float_buildin_var[i].global_id);
         if(float_buildin_var[i].global_id == global_id) {
             return float_buildin_var[i].value_var;
         }
@@ -154,7 +156,7 @@ char* Parser::get_var_name(int global_id)
 void Parser::assign_var(int global_id, float value)
 {
     int i = 0;
-    MSG("assign: %s(%i) = %f\n", Parser::get_var_name(global_id), global_id, value);
+    //MSG("assign: %s(%i) = %f\n", Parser::get_var_name(global_id), global_id, value);
     while(float_buildin_var[i].global_id != 0) {
         if(float_buildin_var[i].global_id != 0) {
             float_buildin_var[i].value_var = value;
@@ -168,7 +170,7 @@ void Parser::assign_var(int global_id, float value)
 void Parser::atom(float &value)
 {
     int id = 0, last = 0;
-    MSG("atom = %s\n", Parser::P.tokens[Parser::P.index].data);
+    //MSG("atom = %s\n", Parser::P.tokens[Parser::P.index].data);
 
     switch(Parser::P.tokens[Parser::P.index].type) {
     case Parser_types::IDENTIFIER:
@@ -178,7 +180,7 @@ void Parser::atom(float &value)
         } else if((id = find_var(Parser::P.tokens[Parser::P.index].data)) != -1) {
             last = Parser::P.index;
             value = Parser::get_var_value(id);
-            MSG("get var: %s = %f", Parser::P.tokens[Parser::P.index].data, value);
+           // MSG("get var: %s = %f", Parser::P.tokens[Parser::P.index].data, value);
             Parser::P.index++;
         } else {
             if(Parser::P.tokens[Parser::P.index+1].type == Parser_types::PARENTHESIS_LEFT)
@@ -187,14 +189,14 @@ void Parser::atom(float &value)
         break;
     case Parser_types::FLOAT_NUMBER:
             value = (float)atof((const char*)Parser::P.tokens[Parser::P.index].data);
-            MSG("found float num\n");
+            //MSG("found float num\n");
             Parser::P.index++;
             break;
 
         case Parser_types::INT_NUMBER:
             value = (float)atoi((const char*)Parser::P.tokens[Parser::P.index].data);
-            MSG("found int number\n");
-            MSG("num = %s\n", Parser::P.tokens[Parser::P.index].data);
+            //MSG("found int number\n");
+            //MSG("num = %s\n", Parser::P.tokens[Parser::P.index].data);
 
             Parser::P.index++;
             break;
@@ -209,14 +211,14 @@ void Parser::atom(float &value)
 // ( )
 void Parser::eval_expr6(float &value)
 {
-    MSG("EVAL6\n");
+    //MSG("EVAL6\n");
     if(Parser::P.tokens[Parser::P.index].type == Parser_types::PARENTHESIS_LEFT) {
         Parser::P.index++;
 
         Parser::eval_expr(value);
 
         if(Parser::P.tokens[Parser::P.index].type != Parser_types::PARENTHESIS_RIGHT) {
-            MSG("expected )\n");
+            //MSG("expected )\n");
             return;
         }
         Parser::P.index++;
@@ -228,11 +230,11 @@ void Parser::eval_expr6(float &value)
 // !
 void Parser::eval_expr5(float &value)
 {
-    MSG("EVAL5\n");
+   // MSG("EVAL5\n");
     Parser::eval_expr6(value);
 
     if(Parser::P.tokens[Parser::P.index].type == Parser_types::EXL) {
-        MSG("found !\n");
+       // MSG("found !\n");
         if(value == 0.0f) {
             value = 1.0f;
             Parser::P.index++;
@@ -240,7 +242,7 @@ void Parser::eval_expr5(float &value)
         }
 
         if(value < 0.0f) {
-            MSG("skip factorial\n");
+           // MSG("skip factorial\n");
             Parser::P.index++;
             return;
         }
@@ -257,21 +259,21 @@ void Parser::eval_expr5(float &value)
 // unary -
 void Parser::eval_expr4(float &value)
 {
-    MSG("EVAL4\n");
+    //MSG("EVAL4\n");
     int last = -1;
     if(Parser::P.tokens[Parser::P.index].type == Parser_types::PLUS || Parser::P.tokens[Parser::P.index].type == Parser_types::MINUS) {
         last = Parser::P.index++;
-        MSG("unary + - %i\n", last);
+        //MSG("unary + - %i\n", last);
     }
 
     Parser::eval_expr5(value);
-    MSG("value unary -   = %f\n", value);
+    //MSG("value unary -   = %f\n", value);
     if(last > -1) {
-        MSG("unary   token: %s\n", Parser::P.tokens[last].data);
+        //MSG("unary   token: %s\n", Parser::P.tokens[last].data);
         if(Parser::P.tokens[last].type == Parser_types::MINUS) {
-            MSG("found unary -\n");
+            //MSG("found unary -\n");
             value = -value;
-            MSG("value ----- : %f", value);
+            //MSG("value ----- : %f", value);
         }
     }
 }
@@ -279,11 +281,11 @@ void Parser::eval_expr4(float &value)
 // ^
 void Parser::eval_expr3(float &value)
 {
-    MSG("EVAL3\n");
+    //MSG("EVAL3\n");
     Parser::eval_expr4(value);
     if(Parser::P.tokens[Parser::P.index].type == Parser_types::CARET) {
         float part = 0.0f;
-        MSG("found power\n");
+        //MSG("found power\n");
         Parser::P.index++;
         Parser::eval_expr4(part);
 
@@ -318,13 +320,13 @@ void Parser::eval_expr3(float &value)
 // * /
 void Parser::eval_expr2(float &value)
 {
-    MSG("EVAL2\n");
+    //MSG("EVAL2\n");
     Parser::eval_expr3(value);
     while(Parser::P.tokens[Parser::P.index].type == Parser_types::MULT || Parser::P.tokens[Parser::P.index].type == Parser_types::DIV) {
         float part = 0.0f;
         int last = 0;
-        MSG("found * /\n");
-        MSG("%s\n", Parser::P.tokens[Parser::P.index].data);
+        //MSG("found * /\n");
+        //MSG("%s\n", Parser::P.tokens[Parser::P.index].data);
 
         last = Parser::P.index++;
 
@@ -337,28 +339,28 @@ void Parser::eval_expr2(float &value)
 
             case Parser_types::DIV:
                 if(part == 0.0f) {
-                    MSG("div to NULL\n");
+                    //MSG("div to NULL\n");
                     value = 0.0f;
                     return;
                 }
                 value /= part;
                 break;
         };
-        MSG("value = %f\n", value);
+        //MSG("value = %f\n", value);
     }
 }
 
 // + -
 void Parser::eval_expr1(float &value)
 {
-    MSG("EVAL1\n");
+    //MSG("EVAL1\n");
     Parser::eval_expr2(value);
     while(Parser::P.tokens[Parser::P.index].type == Parser_types::PLUS || Parser::P.tokens[Parser::P.index].type == Parser_types::MINUS) {
         float part = 0.0f;
         int last = 0;
-        MSG("found + -\n");
+        //MSG("found + -\n");
         last = Parser::P.index++;
-        MSG("%s\n", Parser::P.tokens[Parser::P.index].data);
+        //MSG("%s\n", Parser::P.tokens[Parser::P.index].data);
         Parser::eval_expr2(part);
         switch(Parser::P.tokens[last].type) {
             case Parser_types::PLUS:
@@ -375,9 +377,9 @@ void Parser::eval_expr1(float &value)
 // =
 void Parser::eval_expr0(float &value)
 {
-    MSG("EVAL0\n");
+    //MSG("EVAL0\n");
      if(Parser::P.tokens[Parser::P.index].type == Parser_types::IDENTIFIER) {
-         MSG("found ident = %s\n", Parser::P.tokens[Parser::P.index].data);
+         //MSG("found ident = %s\n", Parser::P.tokens[Parser::P.index].data);
          int var_id = -1;
          if((var_id = find_var(Parser::P.tokens[Parser::P.index].data)) < 0) {
              if(Parser::P.tokens[Parser::P.index+1].type == Parser_types::PARENTHESIS_LEFT) {
@@ -385,18 +387,18 @@ void Parser::eval_expr0(float &value)
                  return;
              }
          }
-         MSG("\nololololololo\n");
+         //MSG("\nololololololo\n");
          if(var_id <= 0) {
-             MSG("EVAL0 exit var_id < 0");
+             //MSG("EVAL0 exit var_id < 0");
              return;
          }
 
-         MSG("found var: %s\n", Parser::P.tokens[Parser::P.index].data);
+         //MSG("found var: %s\n", Parser::P.tokens[Parser::P.index].data);
          float var_value = Parser::get_var_value(var_id);
-         MSG("Value var x = %f\n", var_value);
+         //MSG("Value var x = %f\n", var_value);
          Parser::assign_var(var_id, var_value);
          value = var_value;
-         MSG("EVAL0 value = %f\n", value);
+         //MSG("EVAL0 value = %f\n", value);
          Parser::eval_expr1(value);
          return;
      }
@@ -406,9 +408,9 @@ void Parser::eval_expr0(float &value)
 // begin
 void Parser::eval_expr(float &value)
 {
-    MSG("EVAL\n");
+    //MSG("EVAL\n");
     if(Parser::P.index > (Parser::P.num_tokens - 1)) {
-        MSG("no expression\n");
+        //MSG("no expression\n");
         return;
     }
 
@@ -425,23 +427,23 @@ float Parser::syntax_parser()
     do {
         value = 0.0f;
         if(Parser::P.tokens[Parser::P.index].type == Parser_types::IDENTIFIER) {
-            MSG("token is identificator\n");
+            //MSG("token is identificator\n");
             Parser::eval_expr(value);
         }
         else {
             Parser::eval_expr1(value);
-            MSG("token is not identificator\n");
+            //MSG("token is not identificator\n");
         }
         Parser::P.index++;
     } while(Parser::P.index < (Parser::P.num_tokens - 1));
-    MSG("end syntax\n");
-    MSG("value = %f\n", value);
+    //MSG("end syntax\n");
+    //MSG("value = %f\n", value);
     return value;
 }
 
 void Parser::lexer_parser(const char *text)
 {
-    MSG("[DEBUG] lexer_parser()\n");
+    //MSG("[DEBUG] lexer_parser()\n");
     char *ptr = (char *)text;
 
     while(*ptr != '\0') {
@@ -452,10 +454,10 @@ void Parser::lexer_parser(const char *text)
         }
         if(isalpha(*ptr)) {
             char *begin = ptr;
-            MSG("isalpha!\n");
+            //MSG("isalpha!\n");
 
             while((isalpha(*ptr) || isdigit(*ptr)) && ((ptr-begin) < 63)) {
-                MSG("%c\n", *ptr); ptr++;
+                //MSG("%c\n", *ptr); ptr++;
             }
 
             Parser::P.tokens[Parser::P.num_tokens].type = Parser_types::IDENTIFIER;
@@ -464,7 +466,7 @@ void Parser::lexer_parser(const char *text)
             ptr--;
             Parser::P.num_tokens++;
         } else if(isdigit(*ptr)) {
-            MSG("isdigit! : ");
+            //MSG("isdigit! : ");
             char *begin = ptr;
             while(isdigit(*ptr))
                 ptr++;
@@ -474,10 +476,10 @@ void Parser::lexer_parser(const char *text)
                     ptr++;
                 while(isdigit(*ptr))
                     ptr++;
-                MSG("float num\n");
+               // MSG("float num\n");
                 Parser::P.tokens[Parser::P.num_tokens].type = Parser_types::FLOAT_NUMBER;
             } else {
-                MSG("int num\n");
+                //MSG("int num\n");
                 Parser::P.tokens[Parser::P.num_tokens].type = Parser_types::INT_NUMBER;
             }
             Parser::P.tokens[Parser::P.num_tokens].data = (char*) malloc(sizeof(char) * (ptr - begin));
@@ -485,103 +487,102 @@ void Parser::lexer_parser(const char *text)
             ptr--;
             Parser::P.num_tokens++;
         } else if(isprint(*ptr)) {
-            MSG("isprint! : ");
+            //MSG("isprint! : ");
             switch(*ptr) {
 
             case '(':
-                MSG("(\n");
+                //MSG("(\n");
                 Parser::P.tokens[Parser::P.num_tokens].type = Parser_types::PARENTHESIS_LEFT;
                 Parser::P.tokens[Parser::P.num_tokens].data = (char*)malloc(sizeof(char) * 1);
                 textcpy(ptr, Parser::P.tokens[Parser::P.num_tokens].data, 1);
                 break;
 
             case ')':
-                MSG(")\n");
+                //MSG(")\n");
                 Parser::P.tokens[Parser::P.num_tokens].type = Parser_types::PARENTHESIS_RIGHT;
                 Parser::P.tokens[Parser::P.num_tokens].data = (char*)malloc(sizeof(char) * 1);
                 textcpy(ptr, Parser::P.tokens[Parser::P.num_tokens].data, 1);
                 break;
 
             case '!':
-                MSG("!\n");
+                //MSG("!\n");
                 Parser::P.tokens[Parser::P.num_tokens].type = Parser_types::EXL;
                 Parser::P.tokens[Parser::P.num_tokens].data = (char *)malloc(sizeof(char) * 1);
                 textcpy(ptr, Parser::P.tokens[Parser::P.num_tokens].data, 1);
                 break;
 
             case '^':
-                MSG("^\n");
+                //MSG("^\n");
                 Parser::P.tokens[Parser::P.num_tokens].type = Parser_types::CARET;
                 Parser::P.tokens[Parser::P.num_tokens].data = (char*)malloc(sizeof(char) * 1);
                 textcpy(ptr, Parser::P.tokens[Parser::P.num_tokens].data, 1);
                 break;
 
             case '*':
-                MSG("*\n");
+                //MSG("*\n");
                 Parser::P.tokens[Parser::P.num_tokens].type = Parser_types::MULT;
                 Parser::P.tokens[Parser::P.num_tokens].data = (char*)malloc(sizeof(char) * 1);
                 textcpy(ptr, Parser::P.tokens[Parser::P.num_tokens].data, 1);
                 break;
 
             case '/':
-                MSG("/\n");
+                //MSG("/\n");
                 Parser::P.tokens[Parser::P.num_tokens].type = Parser_types::DIV;
                 Parser::P.tokens[Parser::P.num_tokens].data = (char*)malloc(sizeof(char) * 1);
                 textcpy(ptr, Parser::P.tokens[Parser::P.num_tokens].data, 1);
                 break;
 
             case '+':
-                MSG("+\n");
+                //MSG("+\n");
                 Parser::P.tokens[Parser::P.num_tokens].type = Parser_types::PLUS;
                 Parser::P.tokens[Parser::P.num_tokens].data = (char*)malloc(sizeof(char) * 1);
                 textcpy(ptr, Parser::P.tokens[Parser::P.num_tokens].data, 1);
                 break;
 
             case '-':
-                MSG("-\n");
+                //MSG("-\n");
                 Parser::P.tokens[Parser::P.num_tokens].type = Parser_types::MINUS;
                 Parser::P.tokens[Parser::P.num_tokens].data = (char*)malloc(sizeof(char) * 1);
                 textcpy(ptr, Parser::P.tokens[Parser::P.num_tokens].data, 1);
                 break;
 
             default:
-                MSG("undefined token\n");
+                //MSG("undefined token\n");
                 return;
             };
             Parser::P.num_tokens++;
         }
         ptr++;
         if(*ptr == '\0') {
-            MSG("null_symbol\n");
+            //MSG("null_symbol\n");
             Parser::P.tokens[Parser::P.num_tokens].data = (char*)malloc(sizeof(char) * 1);
             Parser::P.tokens[Parser::P.num_tokens].type = Parser_types::EOE;
             textcpy("]", Parser::P.tokens[Parser::P.num_tokens].data, 1);
             Parser::P.num_tokens++;
         }
     }
-    MSG("close : lexer_parser()\n");
+   //MSG("close : lexer_parser()\n");
 }
 
 void Parser::parser_create()
 {
     Parser_types::float_var_value test[2] = {{50, 0.0}, //_
                                             {0, 0.0}};
-    MSG("parser_create x = %f\n", Parser::get_var_value(50));
+   // MSG("parser_create x = %f\n", Parser::get_var_value(50));
 }
 
 void Parser::parse_text(const char *text, float &value1)
 {
     setlocale(LC_NUMERIC, "C");
-    //Parser::assign_var(50, 8.0);
-    MSG("value x = %f\n", float_buildin_var[0].value_var);
+    //MSG("value R = %f\n", float_buildin_var[0].value_var);
     Parser::lexer_parser(text);
     value = Parser::syntax_parser();
     value1 = value;
     Parser::assign_var(50, value);
     for(int i = 0; i < Parser::P.num_tokens; i++) {
-        MSG("(%s) ", Parser::P.tokens[i].data);
+        //MSG("(%s) ", Parser::P.tokens[i].data);
     }
-    MSG("\n");
+    //MSG("\n");
     for(int i = 0; i < Parser::P.num_tokens; i++) {
         free(Parser::P.tokens[i].data);
         Parser::P.tokens[i].data = NULL;
