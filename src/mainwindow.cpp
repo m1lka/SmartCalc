@@ -1,9 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <cstring>
 
 #define STRINGIFY(s) #s
 
 float value_expr = 0.0f;
+char *ptr = NULL;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -45,6 +47,11 @@ void MainWindow::on_calc_expr_clicked()
     QString value_expr_str;
     if(!ui->expr_text_edit->toPlainText().isEmpty()) {
         P.parse_text(ui->expr_text_edit->toPlainText().toAscii().data(), value_expr);
-        ui->history_text->setText(ui->expr_text_edit->toPlainText() + "=" + value_expr_str.sprintf("%f", value_expr));
+        ui->history_text->append(ui->expr_text_edit->toPlainText() + "=" + value_expr_str.sprintf("%f", value_expr));
     }
+}
+
+void MainWindow::on_expr_text_edit_textChanged()
+{
+
 }
