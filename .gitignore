@@ -1,9 +1,7 @@
 /src/*.o
 /src/*.swp
 /src/*~
-/src/*.swp
 /include/*~
 /include/*.swp
 *.user
-/bin/
 *~
