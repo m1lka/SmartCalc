@@ -38,11 +38,13 @@ struct parser_t {
     token_t tokens[256];
     unsigned num_tokens;
     unsigned index;
+    unsigned error;
 
     parser_t()
     {
         this->num_tokens = 0;
         this->index = 0;
+        this->error = 0;
     }
 
     ~parser_t()
@@ -143,8 +145,7 @@ static Parser_types::identif_t identfiers[] =
 class Parser {
     Parser_types::parser_t P;
 
-
-
+    void error_set(unsigned error_value);
     void eval_expr(float &value);
     void eval_expr0(float &value);
     void eval_expr1(float &value);
@@ -166,8 +167,7 @@ public:
     Parser() {}
 
     ~Parser() {}
-    void parser_create();
-    void parse_text(const char *text, float &value1);
+    unsigned parse_text(const char *text, float &value1);
 };
 
 

@@ -28,11 +28,12 @@ class MainWindow : public QMainWindow
 
         void on_calc_expr_clicked();
 
-<<<<<<< HEAD
-=======
         void on_expr_text_edit_textChanged();
 
->>>>>>> testing
+        void on_history_text_textChanged();
+
+        void on_calc_expr_clicked(bool checked);
+
 private:
         Ui::MainWindow *ui;
         HelpDialog *program_help_dialog;
