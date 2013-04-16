@@ -5,6 +5,7 @@
 #include <QtGui>
 #include "helpdialog.h"
 #include "parser.h"
+#include "grafic_window.h"
 
 namespace Ui {
     class MainWindow;
@@ -28,17 +29,16 @@ class MainWindow : public QMainWindow
 
         void on_calc_expr_clicked();
 
-        void on_expr_text_edit_textChanged();
+        void on_build_grafic_clicked();
 
-        void on_history_text_textChanged();
-
-        void on_calc_expr_clicked(bool checked);
+        void on_function_text_edit_cursorPositionChanged();
 
 private:
         Ui::MainWindow *ui;
         HelpDialog *program_help_dialog;
+        Grafic_window *gw;
 
-        bool expr_text_changed;
+        bool expr_text_changed, function_text_changed;
 
 };
 

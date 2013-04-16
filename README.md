@@ -5,8 +5,8 @@ SmartCalc
 Программа предназначена для расчета значения некоторого математического выражения.
 
 Исполняемые файлы:
-  Ubuntu: https://www.dropbox.com/s/02eoldyfx71lh8d/SmartCalc-linux%28ubuntu%29-0.4.3%20beta.zip
-  Windows: https://www.dropbox.com/s/ywed2l5kxupap0n/SmartCalc-windows-0.4.3%20beta.zip
+  Ubuntu: https://www.dropbox.com/s/wjfess4v0rcq0wp/SmartCalc-Ubuntu-0.5-beta.zip
+  Windows: Временно недоступно!
 
 Инструкции по компилированию:
 

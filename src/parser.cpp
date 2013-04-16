@@ -6,9 +6,9 @@
 #include <iostream>
 
 float value = 0.0f;
-Parser_types::float_var_value float_buildin_var[2] =
+Parser_types::float_var_value float_buildin_var[] =
 {
-    {50, 0.0}, {0, 0.0}
+    {40, 0.0}, {50, 0.0}, {0, 0.0}
 };
 
 #define textcpy(text_p, to_p, n) for(int i = 0; i < n; i++) {to_p[i] = text_p[i];} to_p[n] = '\0';
@@ -164,7 +164,7 @@ void Parser::assign_var(int global_id, float value)
     int i = 0;
     MSG("assign: %s(%i) = %f\n", Parser::get_var_name(global_id), global_id, value);
     while(float_buildin_var[i].global_id != 0) {
-        if(float_buildin_var[i].global_id != 0) {
+        if(float_buildin_var[i].global_id == global_id) {
             float_buildin_var[i].value_var = value;
             return;
         }
@@ -574,10 +574,10 @@ void Parser::lexer_parser(const char *text)
     log_print("lexer_parser(): exit function\n");
 }
 
-unsigned Parser::parse_text(const char *text, float &value1)
+unsigned Parser::parse_text_for_calc(const char *text, float &value1)
 {
     setlocale(LC_NUMERIC, "C");
-    log_print("parse_text(): enter\n");
+    log_print("parse_text_for_calc(): enter\n");
     Parser::P.error = 0;
     log_print("\tvalue R = %f\n", float_buildin_var[0].value_var);
     Parser::lexer_parser(text);
@@ -585,10 +585,10 @@ unsigned Parser::parse_text(const char *text, float &value1)
     value1 = value;
     Parser::assign_var(50, value);
     log_print("\ttokens:\n\t");
-    for(int i = 0; i < Parser::P.num_tokens; i++) {
+    for(unsigned i = 0; i < Parser::P.num_tokens; i++) {
        log_print("(%s) ", Parser::P.tokens[i].data);
     }
-    for(int i = 0; i < Parser::P.num_tokens; i++) {
+    for(unsigned i = 0; i < Parser::P.num_tokens; i++) {
         free(Parser::P.tokens[i].data);
         Parser::P.tokens[i].data = NULL;
         Parser::P.tokens[i].type = 0;
@@ -598,7 +598,37 @@ unsigned Parser::parse_text(const char *text, float &value1)
     Parser::P.num_tokens = 0;
     if(Parser::P.error != 0)
         return Parser::P.error;
-    log_print("parse_text(): exit function\n");
+    log_print("parse_text_for_calc(): exit function\n");
+    log_print("\n\n\n");
+    return 0;
+}
+
+unsigned Parser::parse_text_for_grafic(const char *text, float value_x, float &value1)
+{
+    setlocale(LC_NUMERIC, "C");
+    log_print("parse_text_for_grafic(): enter\n");
+    Parser::P.error = 0;
+    Parser::lexer_parser(text);
+    printf("x = %f", value_x);
+    Parser::assign_var(40, value_x);
+    log_print("\tvalue x = %f = x = %f\n", Parser::get_var_value(40), value_x);
+    value = Parser::syntax_parser();
+    value1 = value;
+    log_print("\ttokens:\n\t");
+    for(unsigned i = 0; i < Parser::P.num_tokens; i++) {
+       log_print("(%s) ", Parser::P.tokens[i].data);
+    }
+    for(unsigned i = 0; i < Parser::P.num_tokens; i++) {
+        free(Parser::P.tokens[i].data);
+        Parser::P.tokens[i].data = NULL;
+        Parser::P.tokens[i].type = 0;
+    }
+    log_print("\n");
+    Parser::P.index = 0;
+    Parser::P.num_tokens = 0;
+    if(Parser::P.error != 0)
+        return Parser::P.error;
+    log_print("parse_text_for_grafic(): exit function\n");
     log_print("\n\n\n");
     return 0;
 }

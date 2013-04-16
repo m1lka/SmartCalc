@@ -1,10 +1,10 @@
-#include "mainwindow.h"
+#include "include/mainwindow.h"
+#include "glwindow.h"
 #include "ui_mainwindow.h"
 #include <cstring>
 #include <cstdio>
 #include "log.h"
 
-#define STRINGIFY(s) #s
 
 float value_expr = 0.0f;
 char *ptr = NULL;
@@ -31,21 +31,24 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     program_help_dialog = new HelpDialog(this);
-    if(init_log())
+    gw = new Grafic_window(this);
+    if(!init_log())
         MSG("log don't create\n");
     expr_text_changed = false;
+    function_text_changed = false;
 }
 
 MainWindow::~MainWindow()
 {
     destroy_log();
     delete ui;
+    delete gw;
     delete program_help_dialog;
 }
 
 void MainWindow::on_about_program_action_triggered()
 {
-    QMessageBox::about(this, QString::fromUtf8("О программе"), QString::fromUtf8("Автор: Молокин m1lka Руслан\nВерсия: 0.5.1 beta"));
+    QMessageBox::about(this, QString::fromUtf8("О программе"), QString::fromUtf8("Автор: Молокин m1lka Руслан\nВерсия: 0.6 beta"));
 }
 
 void MainWindow::on_program_help_action_triggered()
@@ -61,7 +64,7 @@ void MainWindow::on_expr_text_edit_cursorPositionChanged()
     }
 }
 
-void del_null_from_result(float value, char *str_result)
+void del_zero_from_result(float value, char *str_result)
 {
     char str_src[50], *s_pointer = str_src;
     bool found_dot = false;
@@ -92,19 +95,24 @@ void del_null_from_result(float value, char *str_result)
     }
 }
 
+void del_eol_from_expression_data(char *str_src, char *str_dest)
+{
+
+}
+
 void MainWindow::on_calc_expr_clicked()
 {
     unsigned error = 0;
-    char str[50];
-    QString value_expr_str;
+    char result_str[50], expression[512];
+
     QColor color_error(255, 0, 0), color_normal(0, 0, 0);
     if(expr_text_changed) {
         if(!ui->expr_text_edit->toPlainText().isEmpty()) {
-            error = P.parse_text(ui->expr_text_edit->toPlainText().toAscii().data(), value_expr);
+            error = P.parse_text_for_calc(ui->expr_text_edit->toPlainText().toAscii().data(), value_expr);
             if(error == 0) {
                 ui->history_text->setTextColor(color_normal);
-                del_null_from_result(value_expr, str);
-                ui->history_text->append(ui->expr_text_edit->toPlainText() + " = " + str);
+                del_zero_from_result(value_expr, result_str);
+                ui->history_text->append(ui->expr_text_edit->toPlainText() + " = " + result_str);
             }
             else {
                 for(int i = 0; i < NUM_ERROR; i++) {
@@ -123,17 +131,24 @@ void MainWindow::on_calc_expr_clicked()
     }
 }
 
-void MainWindow::on_expr_text_edit_textChanged()
+void MainWindow::on_build_grafic_clicked()
 {
-
+    if(function_text_changed) {
+        if(!ui->function_text_edit->toPlainText().isEmpty()) {
+            gw->set_limit_x_in_glwindow(ui->begin_x->value(), ui->end_x->value());
+            printf("function() = %s\n", ui->function_text_edit->toPlainText().toAscii().data());
+            gw->set_text_for_parse(ui->function_text_edit->toPlainText().toAscii().data());
+            gw->show();
+        } else {
+            close();
+        }
+    }
 }
 
-void MainWindow::on_history_text_textChanged()
+void MainWindow::on_function_text_edit_cursorPositionChanged()
 {
-
-}
-
-void MainWindow::on_calc_expr_clicked(bool checked)
-{
-
+    if(!function_text_changed) {
+        function_text_changed = true;
+        ui->function_text_edit->setText("");
+    }
 }

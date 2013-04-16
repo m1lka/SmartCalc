@@ -126,7 +126,7 @@ static Parser_types::identif_t identfiers[] =
     {Parser_types::FUNCTION, "asin", 16},
     {Parser_types::FUNCTION, "asinh", 17},
     {Parser_types::FUNCTION, "acos", 18},
-    {Parser_types::FUNCTION, "acoh", 19},
+    {Parser_types::FUNCTION, "acosh", 19},
     {Parser_types::FUNCTION, "atan", 20},
     {Parser_types::FUNCTION, "atanh", 21},
     {Parser_types::FUNCTION, "sqr", 22},
@@ -137,6 +137,7 @@ static Parser_types::identif_t identfiers[] =
     {Parser_types::FUNCTION, "exp2", 27},
     {Parser_types::FUNCTION, "abs", 28},
     {Parser_types::VARIABLE, "R", 50},
+    {Parser_types::VARIABLE, "x", 40},
     {0, "", 0}
 };
 
@@ -165,9 +166,10 @@ class Parser {
 
 public:
     Parser() {}
-
     ~Parser() {}
-    unsigned parse_text(const char *text, float &value1);
+
+    unsigned parse_text_for_calc(const char *text, float &value1);
+    unsigned parse_text_for_grafic(const char *text, float value_x, float &value1);
 };
 
 
