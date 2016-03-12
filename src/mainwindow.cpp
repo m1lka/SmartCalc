@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cstdio>
 #include "log.h"
+#include <QMessageBox>
 
 
 float value_expr = 0.0f;
@@ -25,9 +26,7 @@ Error error_table[] =
     {5, "ололо ошибка"}
 };
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     program_help_dialog = new HelpDialog(this);
@@ -95,20 +94,20 @@ void del_zero_from_result(float value, char *str_result)
     }
 }
 
-void del_eol_from_expression_data(char *str_src, char *str_dest)
-{
+//void del_eol_from_expression_data(char *str_src, char *str_dest)
+//{
 
-}
+//}
 
 void MainWindow::on_calc_expr_clicked()
 {
     unsigned error = 0;
-    char result_str[50], expression[512];
+    char result_str[50]/*, /*expression[512]*/;
 
     QColor color_error(255, 0, 0), color_normal(0, 0, 0);
     if(expr_text_changed) {
         if(!ui->expr_text_edit->toPlainText().isEmpty()) {
-            error = P.parse_text_for_calc(ui->expr_text_edit->toPlainText().toAscii().data(), value_expr);
+            error = P.parse_text_for_calc(ui->expr_text_edit->toPlainText().toStdString().c_str(), value_expr);
             if(error == 0) {
                 ui->history_text->setTextColor(color_normal);
                 del_zero_from_result(value_expr, result_str);
@@ -136,8 +135,8 @@ void MainWindow::on_build_grafic_clicked()
     if(function_text_changed) {
         if(!ui->function_text_edit->toPlainText().isEmpty()) {
             gw->set_limit_x_in_glwindow(ui->begin_x->value(), ui->end_x->value());
-            printf("function() = %s\n", ui->function_text_edit->toPlainText().toAscii().data());
-            gw->set_text_for_parse(ui->function_text_edit->toPlainText().toAscii().data());
+            printf("function() = %s\n", ui->function_text_edit->toPlainText().toStdString().c_str());
+            gw->set_text_for_parse((char *)ui->function_text_edit->toPlainText().toStdString().c_str());
             gw->show();
         } else {
             close();
