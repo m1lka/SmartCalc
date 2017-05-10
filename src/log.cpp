@@ -9,7 +9,7 @@ bool init_log()
     log = fopen("calc.log", "w");
     if(!log)
         return false;
-    fprintf(log, "\tLogger file SmartCalc v0.6 beta.\n");
+    fprintf(log, "\tLog file SmartCalc v0.6 beta.\n");
 }
 
 void log_print(const char *text, ...)
@@ -25,6 +25,6 @@ void log_print(const char *text, ...)
 
 void destroy_log()
 {
-    fprintf(log, "\tEnd logger file.\n");
+    fprintf(log, "\tEnd log file.\n");
     fclose(log);
 }

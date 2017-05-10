@@ -32,8 +32,6 @@ void Grafic_window::set_limit_x_in_glwindow(float begin_x_user_mw, float end_x_u
 
 void Grafic_window::set_text_for_parse(char *text)
 {
-    //printf("f = %s\n", text);
     strcpy(text_function, text);
-    //printf("ff = %s\n", text_ololo);
     main_gl_window->set_text_func(text_function);
 }

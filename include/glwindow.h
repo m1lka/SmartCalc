@@ -21,10 +21,10 @@ class GLWindow : public QGLWidget
         void set_text_func(char *text);
 
     protected:
-        void initializeGL();
-        void paintGL();
-        void resizeGL(int w, int h);
-        void mouseReleaseEvent(QMouseEvent *event);
+        virtual void initializeGL();
+        virtual void paintGL();
+        virtual void resizeGL(int w, int h);
+        virtual void mouseReleaseEvent(QMouseEvent *event);
 };
 
 #endif // GLWINDOW_H

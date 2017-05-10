@@ -172,7 +172,7 @@ void Parser::assign_var(int global_id, float value)
     }
 }
 
-// ololo
+// определение типа очередного токена
 void Parser::atom(float &value)
 {
     int id = 0, last = 0;

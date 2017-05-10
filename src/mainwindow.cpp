@@ -47,7 +47,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_about_program_action_triggered()
 {
-    QMessageBox::about(this, QString::fromUtf8("О программе"), QString::fromUtf8("Автор: Молокин m1lka Руслан\nВерсия: 0.6 beta"));
+    QMessageBox::about(this, QString::fromUtf8("О программе"), QString::fromUtf8("Автор: Молокин m1lka Руслан\nВерсия: 0.6.1 beta"));
 }
 
 void MainWindow::on_program_help_action_triggered()
@@ -94,15 +94,10 @@ void del_zero_from_result(float value, char *str_result)
     }
 }
 
-//void del_eol_from_expression_data(char *str_src, char *str_dest)
-//{
-
-//}
-
 void MainWindow::on_calc_expr_clicked()
 {
     unsigned error = 0;
-    char result_str[50]/*, /*expression[512]*/;
+    char result_str[50];
 
     QColor color_error(255, 0, 0), color_normal(0, 0, 0);
     if(expr_text_changed) {
